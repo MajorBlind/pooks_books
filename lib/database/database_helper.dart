@@ -13,30 +13,52 @@ class DatabaseHelper {
   static Database? _database;
 
   DatabaseHelper._init();
-}
 
-Future<Database> get database async{
-    if (_database != null){
+    // Getter function for database
+    Future<Database> get database async{
+        if (_database != null){
+            return _database!;
+        }
+
+        _database = await _initDB('books.db');
+
         return _database!;
     }
 
-    _database = await _initDB('books.db');
+    // Initializes database
+    Future<Database> _initDB(String fileName) async{
+        sqfliteFfiInit();
+        databaseFactory = databaseFactoryFfi;
 
-    return _database!;
-}
+        final dbPath = await getDatabasesPath();
+        final path = join(dbPath, fileName);
 
-Future<Database> _initDB(String fileName) async{
-    sqfliteFfiInit();
-    databaseFactory = databaseFactoryFfi;
+        return await databaseFactory.openDatabase(
+            path,
+            options: OpenDatabaseOptions(
+                version: 1,
+                onCreate: _createDB,
+            ),
+        );
+    }
 
-    final dbPath = await getDatabasePath();
-    final path = join(dbPath, fileName);
-
-    return await databaseFactory.openDatabase(
-        path,
-        options: OpenDatabaseOptions(
-            version: 1,
-            onCreate: _createDB,
-        ),
-    );
+    // Defines 'books' table
+    Future<void> _createDB(Database db, int version) async{
+        await db.execute('''
+        CREATE TABLE books(
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            title TEXT NOT NULL,
+            author TEXT NOT NULL,
+            series TEXT,
+            status TEXT NOT NULL,
+            startDate TEXT,
+            finishDate TEXT,
+            rating REAL,
+            spiceRating INTEGER,
+            notes TEXT,
+            summary TEXT,
+            coverPath TEXT
+            )
+        ''');
+    }
 }
