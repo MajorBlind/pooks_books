@@ -77,4 +77,25 @@ class DatabaseHelper {
       final result = await db.query('books');
       return result.map((map) => Book.fromMap(map)).toList();
     }
+
+    // Takes book object to overwrite matching database row with new values
+    Future<int> updateBook(Book book) async{
+      final db = await instance.database;
+      return db.update(
+        'books',
+        book.toMap(),
+        where: 'id = ?',
+        whereArgs: [book.id],
+      );
+    }
+
+    // Take books ID and remove the whole row
+    Future<int> deleteBook(int id) async{
+      final db = await instance.database;
+      return db.delete(
+        'books',
+        where: 'id = ?',
+        whereArgs: [id],
+      );
+    }
 }
