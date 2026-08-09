@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 enum ReadingStatus {wantToRead, reading, read}
 
 class Book{
@@ -13,7 +15,11 @@ class Book{
   final String? notes;
   final String? summary;
   final String? coverPath;
-
+  final List<String> characters;
+  final List<String> feelings;
+  final bool? wouldRecommend;
+  final String? quote;
+  
   Book({
     this.id,
     required this.title,
@@ -27,6 +33,10 @@ class Book{
     this.notes,
     this.summary,
     this.coverPath,
+    this.characters = const[],
+    this.feelings = const[],
+    this.wouldRecommend,
+    this.quote,
   });
 
   Map<String, dynamic> toMap(){
@@ -43,6 +53,10 @@ class Book{
       'notes': notes,
       'summary': summary,
       'coverPath': coverPath,
+      'characters': jsonEncode(characters),
+      'feelings': jsonEncode(feelings),
+      'wouldRecommend': wouldRecommend == null ? null: (wouldRecommend! ? 1 : 0),
+      'quote': quote,
     };
   }
 
@@ -64,6 +78,15 @@ class Book{
       notes: map['notes'] as String?,
       summary: map['summary'] as String?,
       coverPath: map['coverPath'] as String?,
+      characters: map['characters'] != null
+        ? List<String>.from(jsonDecode(map['characters'] as String))
+        : [],
+      feelings: map['feelings'] != null
+        ? List<String>.from(jsonDecode(map['feelings'] as String))
+        : [],
+      wouldRecommend: map['wouldRecommend'] == null
+        ? null: map['wouldRecommend'] == 1,
+      quote: map['quote'] as String?,
     );
   }
 }

@@ -58,6 +58,10 @@ class DatabaseHelper {
             notes TEXT,
             summary TEXT,
             coverPath TEXT
+            characters TEXT
+            feelings TEXT
+            wouldRecommend INTEGER
+            quote TEXT
             )
         ''');
     }
