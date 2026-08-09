@@ -13,7 +13,7 @@ class PooksBooksApp extends StatelessWidget{
     return MaterialApp(
       title: 'pooks_books',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink.shade100),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink.shade200),
         useMaterial3: true,
       ),
       home: const BookListScreen(),
