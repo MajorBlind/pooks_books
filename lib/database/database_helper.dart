@@ -61,4 +61,13 @@ class DatabaseHelper {
             )
         ''');
     }
+
+    // Method to actually save Book to database
+    Future<Book> insertBook(Book book) async{
+        final db = await instance.database;
+        final id = await db.insert('books', book.toMap());
+        return book.toMap()['id'] == null
+            ? Book.fromMap({...book.toMap(), 'id': id})
+            : book;
+    }
 }
