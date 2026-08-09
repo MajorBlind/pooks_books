@@ -70,4 +70,11 @@ class DatabaseHelper {
             ? Book.fromMap({...book.toMap(), 'id': id})
             : book;
     }
+
+    // Reads every saved book back out of the database
+    Future<List<Book>> getAllBooks() async{
+      final db = await instance.database;
+      final result = await db.query('books');
+      return result.map((map) => Book.fromMap(map)).toList();
+    }
 }
