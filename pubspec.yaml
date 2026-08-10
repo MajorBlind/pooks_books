@@ -41,6 +41,8 @@ dependencies:
   fl_chart: ^0.69.0
   # Way to store small settings-style values (e.g. reading goal = 30 books) without needing full database
   shared_preferences: ^2.3.2
+  # For shipping updates to user
+  auto_updater: ^0.2.0
   
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
