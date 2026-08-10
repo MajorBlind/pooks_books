@@ -57,10 +57,10 @@ class DatabaseHelper {
             spiceRating INTEGER,
             notes TEXT,
             summary TEXT,
-            coverPath TEXT
-            characters TEXT
-            feelings TEXT
-            wouldRecommend INTEGER
+            coverPath TEXT,
+            characters TEXT,
+            feelings TEXT,
+            wouldRecommend INTEGER,
             quote TEXT
             )
         ''');

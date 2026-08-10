@@ -89,7 +89,7 @@ class _AddBookScreenState extends State<AddBookScreen>{
                       items: ReadingStatus.values.map((status) {
                         return DropdownMenuItem(
                           value: status,
-                          child: Text(status.name),
+                          child: Text(_statusLabel(status)),
                         );
                       }).toList(),
                       onChanged: (value) {
@@ -378,9 +378,29 @@ class _AddBookScreenState extends State<AddBookScreen>{
                   final newBook = Book(
                     title: _titleController.text,
                     author: _authorController.text,
+                    series: _seriesController.text.isEmpty
+                        ? null
+                        : _seriesController.text,
+                    status: _status,
+                    startDate: _startDate,
+                    finishDate: _finishDate,
+                    rating: _rating == 0 ? null : _rating.toDouble(),
+                    spiceRating: _spiceRating == 0 ? null : _spiceRating,
+                    feelings: _selectedFeelings,
+                    summary: _summaryController.text.isEmpty
+                        ? null
+                        : _summaryController.text,
+                    quote: _quoteController.text.isEmpty
+                        ? null
+                        : _quoteController.text,
+                    notes: _notesController.text.isEmpty
+                        ? null
+                        : _notesController.text,
+                        characters: _characters,
+                        wouldRecommend: _wouldRecommend
                   );
                   await DatabaseHelper.instance.insertBook(newBook);
-                  if(context.mounted){
+                  if(context.mounted) {
                     Navigator.pop(context);
                   }
                 },
@@ -391,6 +411,17 @@ class _AddBookScreenState extends State<AddBookScreen>{
         ),
       ),
     );
+  }
+
+  String _statusLabel(ReadingStatus status){
+    switch(status){
+      case ReadingStatus.wantToRead:
+        return 'Want To Read';
+      case ReadingStatus.reading:
+        return 'Reading';
+      case ReadingStatus.read:
+        return 'Read';
+    }
   }
 
   Future<void> _pickDate({required bool isStart}) async{
