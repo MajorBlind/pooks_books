@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'screens/book_list_screen.dart';
+import 'screens/home_screen.dart';
+
 
 void main() {
   runApp(const PooksBooksApp());
@@ -16,7 +17,7 @@ class PooksBooksApp extends StatelessWidget{
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.pink.shade200),
         useMaterial3: true,
       ),
-      home: const BookListScreen(),
+      home: const HomeScreen(),
     );
   }
 }

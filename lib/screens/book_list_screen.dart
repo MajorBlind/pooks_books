@@ -35,10 +35,6 @@ class _BookListScreenState extends State<BookListScreen> {
   Widget build(BuildContext context){
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 247, 195, 212),
-      appBar: AppBar(
-        backgroundColor: Colors.pink.shade200,
-        title: const Text('My Reading List'),
-      ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : books.isEmpty
