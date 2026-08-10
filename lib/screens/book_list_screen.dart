@@ -46,9 +46,66 @@ class _BookListScreenState extends State<BookListScreen> {
                 itemCount: books.length,
                 itemBuilder: (context, index){
                   final book = books[index];
-                  return ListTile(
-                    title: Text(book.title),
-                    subtitle: Text(book.author),
+                  return Dismissible(
+                    key: Key(book.id.toString()),
+                    direction: DismissDirection.endToStart,
+                    background: Container(
+                      alignment: Alignment.centerRight,
+                      padding: const EdgeInsets.only(right: 20),
+                      color: Colors.red.shade300,
+                      child: const Icon(Icons.delete, color: Colors.white),
+                    ),
+                    confirmDismiss: (direction) async{
+                      return await showDialog<bool>(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Delete this book?'),
+                          content: Text('This will permanently delete "${book.title}.'),
+                          actions: [
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, false),
+                              child: const Text('Cancel'),
+                            ),
+                            TextButton(
+                              onPressed: () => Navigator.pop(context, true),
+                              child: const Text('Delete'),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                    onDismissed: (direction) async{
+                      await DatabaseHelper.instance.deleteBook(book.id!);
+                      setState(() {
+                        books.removeAt(index);
+                      });
+                    },
+                    child: ListTile(
+                      title: Row(
+                        children: [
+                          Text(book.title),
+                          if(book.rating != null) ...[
+                            const SizedBox(width: 6),
+                            const Icon(Icons.favorite, color: Colors.pink, size: 14),
+                            const SizedBox(width: 2),
+                            Text(
+                              book.rating!.toInt().toString(),
+                              style: const TextStyle(fontSize: 12),
+                            ),
+                          ],
+                        ],
+                      ),
+                      subtitle: Text('${book.author} -> ${_statusLabel(book.status)}'),
+                      onTap: () async{
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AddBookScreen(bookToEdit: book),
+                          ),
+                        );
+                        _loadBooks();
+                      },
+                    ),
                   );
                 },
             ),
@@ -67,5 +124,16 @@ class _BookListScreenState extends State<BookListScreen> {
         child: const Icon(Icons.add),
       ),
     );
+  }
+
+  String _statusLabel(ReadingStatus status) {
+    switch (status) {
+      case ReadingStatus.wantToRead:
+        return 'Want To Read';
+      case ReadingStatus.reading:
+        return 'Reading';
+      case ReadingStatus.read:
+        return 'Read';
+    }
   }
 }

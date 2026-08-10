@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import '../models/book.dart';
 import '../database/database_helper.dart';
 import '../widgets/journal_card.dart';
+import '../services/book_cover_service.dart';
 
 class AddBookScreen extends StatefulWidget{
-  const AddBookScreen({super.key});
+  final Book? bookToEdit;
+
+  const AddBookScreen({super.key, this.bookToEdit});
 
   @override
   State<AddBookScreen> createState() => _AddBookScreenState();
@@ -37,6 +40,32 @@ class _AddBookScreenState extends State<AddBookScreen>{
   // Instance vars for would I recommend section
   bool? _wouldRecommend;
 
+  String? _coverPath;
+  bool _isFetchingCover = false;
+
+  @override
+  void initState() {
+    super.initState();
+    final book = widget.bookToEdit;
+    if(book != null){
+      _titleController.text = book.title;
+      _authorController.text = book.author;
+      _seriesController.text = book.series ?? '';
+      _status = book.status;
+      _startDate = book.startDate;
+      _finishDate = book.finishDate;
+      _rating = book.rating?.toInt() ?? 0;
+      _spiceRating = book.spiceRating ?? 0;
+      _selectedFeelings.addAll(book.feelings);
+      _summaryController.text = book.summary ?? '';
+      _quoteController.text = book.quote ?? '';
+      _notesController.text = book.notes ?? '';
+      _characters.addAll(book.characters);
+      _wouldRecommend = book.wouldRecommend;
+      _coverPath = book.coverPath;
+    }
+  }
+
   @override
   void dispose(){
     _titleController.dispose();
@@ -55,7 +84,7 @@ class _AddBookScreenState extends State<AddBookScreen>{
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.pink.shade200,
-        title: const Text('Add a book'),
+        title: Text(widget.bookToEdit != null ? 'Edit Book' : 'Add a book'),
       ),
       
       body: Padding(
@@ -98,6 +127,30 @@ class _AddBookScreenState extends State<AddBookScreen>{
                         });
                       },
                     ),
+
+                    const SizedBox(height: 10),
+                    OutlinedButton.icon(
+                      onPressed: _isFetchingCover ? null : _fetchCover,
+                      icon: _isFetchingCover
+                          ? const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                          : const Icon(Icons.image_search),
+                        label: Text(_isFetchingCover ? 'Searching...' : 'Find Cover'),
+                    ),
+                    if(_coverPath != null) ...[
+                      const SizedBox(height: 10),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(8),
+                        child: Image.network(
+                          _coverPath!,
+                          height: 140,
+                          errorBuilder: (context, error, stackTrace) => const Text('Could not load cover image'),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -375,7 +428,8 @@ class _AddBookScreenState extends State<AddBookScreen>{
               const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: () async {
-                  final newBook = Book(
+                  final book = Book(
+                    id: widget.bookToEdit?.id,
                     title: _titleController.text,
                     author: _authorController.text,
                     series: _seriesController.text.isEmpty
@@ -399,8 +453,14 @@ class _AddBookScreenState extends State<AddBookScreen>{
                         characters: _characters,
                         wouldRecommend: _wouldRecommend
                   );
-                  await DatabaseHelper.instance.insertBook(newBook);
-                  if(context.mounted) {
+
+                  if(widget.bookToEdit != null){
+                    await DatabaseHelper.instance.updateBook(book);
+                  }else {
+                    await DatabaseHelper.instance.insertBook(book);
+                  }
+
+                  if(context.mounted){
                     Navigator.pop(context);
                   }
                 },
@@ -474,5 +534,21 @@ class _AddBookScreenState extends State<AddBookScreen>{
         );
       }),
     );
+  }
+
+  Future<void> _fetchCover() async{
+    if(_titleController.text.isEmpty || _authorController.text.isEmpty){
+      return;
+    }
+
+    setState(() => _isFetchingCover = true);
+    final url = await BookCoverService.fetchCoverUrl(
+      _titleController.text, _authorController.text
+    );
+
+    setState(() {
+      _coverPath = url;
+      _isFetchingCover = false;
+    });
   }
 }
