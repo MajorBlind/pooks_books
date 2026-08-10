@@ -426,46 +426,28 @@ class _AddBookScreenState extends State<AddBookScreen>{
               ),
 
               const SizedBox(height: 10),
-              ElevatedButton(
-                onPressed: () async {
-                  final book = Book(
-                    id: widget.bookToEdit?.id,
-                    title: _titleController.text,
-                    author: _authorController.text,
-                    series: _seriesController.text.isEmpty
-                        ? null
-                        : _seriesController.text,
-                    status: _status,
-                    startDate: _startDate,
-                    finishDate: _finishDate,
-                    rating: _rating == 0 ? null : _rating.toDouble(),
-                    spiceRating: _spiceRating == 0 ? null : _spiceRating,
-                    feelings: _selectedFeelings,
-                    summary: _summaryController.text.isEmpty
-                        ? null
-                        : _summaryController.text,
-                    quote: _quoteController.text.isEmpty
-                        ? null
-                        : _quoteController.text,
-                    notes: _notesController.text.isEmpty
-                        ? null
-                        : _notesController.text,
-                        characters: _characters,
-                        wouldRecommend: _wouldRecommend,
-                        coverPath: _coverPath,
-                  );
-
-                  if(widget.bookToEdit != null){
-                    await DatabaseHelper.instance.updateBook(book);
-                  }else {
-                    await DatabaseHelper.instance.insertBook(book);
-                  }
-
-                  if(context.mounted){
-                    Navigator.pop(context);
-                  }
-                },
-                child: const Text('Save Book'),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: _saveBook,
+                      child: const Text('Save Book'),
+                    ),
+                  ),
+                  if (widget.bookToEdit != null) ...[
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.red,
+                          side: const BorderSide(color: Colors.red),
+                        ),
+                        onPressed: _confirmDelete,
+                        child: const Text('Delete'),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
@@ -558,8 +540,66 @@ class _AddBookScreenState extends State<AddBookScreen>{
 
       if(context.mounted){
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Cover search filaed: $e')),
+          SnackBar(content: Text('Cover search failed: $e')),
         );
+      }
+    }
+  }
+
+  Future<void> _saveBook() async{
+    final book = Book(
+      id: widget.bookToEdit?.id,
+      title: _titleController.text,
+      author: _authorController.text,
+      series: _seriesController.text.isEmpty ? null : _seriesController.text,
+      status: _status,
+      startDate: _startDate,
+      finishDate: _finishDate,
+      rating: _rating == 0 ? null : _rating.toDouble(),
+      spiceRating: _spiceRating == 0 ? null : _spiceRating,
+      feelings: _selectedFeelings,
+      summary: _summaryController.text.isEmpty ? null : _summaryController.text,
+      quote: _quoteController.text.isEmpty ? null : _quoteController.text,
+      notes: _notesController.text.isEmpty ? null : _notesController.text,
+      characters: _characters,
+      wouldRecommend: _wouldRecommend,
+      coverPath: _coverPath,
+    );
+
+    if(widget.bookToEdit != null){
+      await DatabaseHelper.instance.updateBook(book);
+    }else {
+      await DatabaseHelper.instance.insertBook(book);
+    }
+
+    if(context.mounted){
+      Navigator.pop(context);
+    }
+  }
+
+  Future<void> _confirmDelete() async{
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Text('This will permanently remove ${_titleController.text} from your journal.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: TextButton.styleFrom(foregroundColor: Colors.red),
+           child: const Text('Delete'),
+         ),
+       ],
+      ),
+    );
+
+    if(confirmed == true){
+      await DatabaseHelper.instance.deleteBook(widget.bookToEdit!.id!);
+      if(context.mounted){
+        Navigator.pop(context);
       }
     }
   }
