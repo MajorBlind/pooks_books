@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:sparkle="http://www.andymatuschak.org/xml-namespaces/sparkle">
+    <channel>
+        <title>Pooks' Books</title>
+        <description>Updates for Pooks' Books</description>
+        <language>en</language>
+        <item>
+            <title>Version 1.0.0</title>
+            <sparkle:version>1</sparkle:version>
+            <sparkle:shortVersionString>1.0.0</sparkle:shortVersionString>
+            <pubDate>Mon, 10 Aug 2026 12:00:00 -0400</pubDate>
+            <enclosure url="https://github.com/MajorBlind/pooks_books/releases/download/v1.0.0/pooks_rev.zip"
+                       sparkle:edSignature="WsnJEehk1xAbz/qsBNDnYO6oqhjjIAyMIjNGIIqmKmFUqyNQqhp4ePXVoVqgIlVtxrmxtzp5sH0xaNFw6BmuBQ=="
+                       sparkle:os="macos"
+                       length="62979185"
+                       type="application/octet-stream" />
+        </item>
+    </channel>
+</rss>
