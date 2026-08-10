@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/book.dart';
 import '../database/database_helper.dart';
 import 'add_book_screen.dart';
+import '../widgets/book_card.dart';
 
 // Stateful widget for having book list on screen
 class BookListScreen extends StatefulWidget {
@@ -41,74 +42,15 @@ class _BookListScreenState extends State<BookListScreen> {
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : books.isEmpty
-            ? const Center(child: Text('No books yet - Add one!'))
-            : ListView.builder(
-                itemCount: books.length,
-                itemBuilder: (context, index){
-                  final book = books[index];
-                  return Dismissible(
-                    key: Key(book.id.toString()),
-                    direction: DismissDirection.endToStart,
-                    background: Container(
-                      alignment: Alignment.centerRight,
-                      padding: const EdgeInsets.only(right: 20),
-                      color: Colors.red.shade300,
-                      child: const Icon(Icons.delete, color: Colors.white),
-                    ),
-                    confirmDismiss: (direction) async{
-                      return await showDialog<bool>(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                          title: const Text('Delete this book?'),
-                          content: Text('This will permanently delete "${book.title}.'),
-                          actions: [
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, false),
-                              child: const Text('Cancel'),
-                            ),
-                            TextButton(
-                              onPressed: () => Navigator.pop(context, true),
-                              child: const Text('Delete'),
-                            ),
-                          ],
-                        ),
-                      );
-                    },
-                    onDismissed: (direction) async{
-                      await DatabaseHelper.instance.deleteBook(book.id!);
-                      setState(() {
-                        books.removeAt(index);
-                      });
-                    },
-                    child: ListTile(
-                      title: Row(
-                        children: [
-                          Text(book.title),
-                          if(book.rating != null) ...[
-                            const SizedBox(width: 6),
-                            const Icon(Icons.favorite, color: Colors.pink, size: 14),
-                            const SizedBox(width: 2),
-                            Text(
-                              book.rating!.toInt().toString(),
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                          ],
-                        ],
-                      ),
-                      subtitle: Text('${book.author} -> ${_statusLabel(book.status)}'),
-                      onTap: () async{
-                        await Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddBookScreen(bookToEdit: book),
-                          ),
-                        );
-                        _loadBooks();
-                      },
-                    ),
-                  );
-                },
-            ),
+              ? const Center (child: Text('No books yet - Add one!'))
+              : ListView(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                children: [
+                  _buildStatusSection('Reading', ReadingStatus.reading),
+                  _buildStatusSection('Want To Read', ReadingStatus.wantToRead),
+                  _buildStatusSection('Read', ReadingStatus.read),
+                ],
+              ),
 
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.pink.shade200,
@@ -126,6 +68,53 @@ class _BookListScreenState extends State<BookListScreen> {
     );
   }
 
+  Widget _buildStatusSection(String label, ReadingStatus status) {
+    final sectionBooks = _booksByStatus(status);
+    if(sectionBooks.isEmpty){
+      return const SizedBox.shrink();
+    }
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              label, 
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+            ),
+          ),
+          const SizedBox(height: 10),
+          SizedBox(
+            height: 210,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              itemCount: sectionBooks.length,
+              itemBuilder: (context, index){
+                final book = sectionBooks[index];
+                return BookCard(
+                  book: book,
+                  onTap: () async{
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => AddBookScreen(bookToEdit: book),
+                      ),
+                    );
+                    _loadBooks();
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   String _statusLabel(ReadingStatus status) {
     switch (status) {
       case ReadingStatus.wantToRead:
@@ -135,5 +124,9 @@ class _BookListScreenState extends State<BookListScreen> {
       case ReadingStatus.read:
         return 'Read';
     }
+  }
+
+  List<Book> _booksByStatus(ReadingStatus status) {
+    return books.where((b) => b.status == status).toList();
   }
 }

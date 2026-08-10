@@ -451,7 +451,8 @@ class _AddBookScreenState extends State<AddBookScreen>{
                         ? null
                         : _notesController.text,
                         characters: _characters,
-                        wouldRecommend: _wouldRecommend
+                        wouldRecommend: _wouldRecommend,
+                        coverPath: _coverPath,
                   );
 
                   if(widget.bookToEdit != null){
@@ -537,18 +538,29 @@ class _AddBookScreenState extends State<AddBookScreen>{
   }
 
   Future<void> _fetchCover() async{
-    if(_titleController.text.isEmpty || _authorController.text.isEmpty){
-      return;
-    }
+    if(_titleController.text.isEmpty || _authorController.text.isEmpty) return;
 
     setState(() => _isFetchingCover = true);
-    final url = await BookCoverService.fetchCoverUrl(
-      _titleController.text, _authorController.text
-    );
 
-    setState(() {
-      _coverPath = url;
-      _isFetchingCover = false;
-    });
+    try{
+      final url = await BookCoverService.fetchCoverUrl(_titleController.text, _authorController.text);
+      setState(() {
+        _coverPath = url;
+        _isFetchingCover = false;
+      });
+      if(url == null && context.mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No cover found this title/author')),
+        );
+      }
+    }catch (e){
+      setState(() => _isFetchingCover = false);
+
+      if(context.mounted){
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Cover search filaed: $e')),
+        );
+      }
+    }
   }
 }
