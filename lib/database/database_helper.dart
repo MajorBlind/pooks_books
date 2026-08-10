@@ -6,6 +6,7 @@ import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:path/path.dart';
 // Book model
 import '../models/book.dart';
+import 'package:path_provider/path_provider.dart';
 
 // Singleton pattern - Assures only one database connection open for entire app
 class DatabaseHelper {
@@ -26,21 +27,21 @@ class DatabaseHelper {
     }
 
     // Initializes database
-    Future<Database> _initDB(String fileName) async{
-        sqfliteFfiInit();
-        databaseFactory = databaseFactoryFfi;
+    Future<Database> _initDB(String fileName) async {
+    sqfliteFfiInit();
+    databaseFactory = databaseFactoryFfi;
 
-        final dbPath = await getDatabasesPath();
-        final path = join(dbPath, fileName);
+    final supportDir = await getApplicationSupportDirectory();
+    final path = join(supportDir.path, fileName);
 
-        return await databaseFactory.openDatabase(
-            path,
-            options: OpenDatabaseOptions(
-                version: 1,
-                onCreate: _createDB,
-            ),
-        );
-    }
+    return await databaseFactory.openDatabase(
+      path,
+      options: OpenDatabaseOptions(
+        version: 1,
+        onCreate: _createDB,
+      ),
+    );
+  }
 
     // Defines 'books' table
     Future<void> _createDB(Database db, int version) async{
