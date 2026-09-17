@@ -46,11 +46,10 @@ Pooks' Books is a personal reading journal — think of it as a diary for your b
 3. Unzip the file and move the app to your **Applications** folder (macOS) or wherever you keep your programs (Windows/Linux).
 4. Open the app.
 
-### macOS / Windows: "Unidentified Developer" or "Untrusted Publisher" Warning
+### "Unidentified Developer" Warning (macOS)
 
-Since this app isn't distributed through the App Store or signed with a paid developer certificate yet, your OS may block the first launch with a warning. Here's how to get past it:
+Since this app isn't distributed through the App Store or signed with a paid developer certificate yet, macOS may block the first launch with a warning. Here's how to get past it:
 
-**On macOS:**
 1. Try to open the app — you'll see a warning that it's from an unidentified developer and can't be opened.
 2. Open **System Settings → Privacy & Security**.
 3. Scroll down to the **Security** section — you'll see a message that "Pooks' Books" was blocked.
@@ -59,17 +58,4 @@ Since this app isn't distributed through the App Store or signed with a paid dev
 
 *(Alternative: right-click (or Control-click) the app icon → **Open** → **Open** again in the dialog that appears.)*
 
-**On Windows:**
-1. When you run the installer/app, Windows SmartScreen may show "Windows protected your PC."
-2. Click **More info**.
-3. Click **Run anyway**.
-
-**On Linux:**
-1. Make sure the binary has execute permission: `chmod +x pooks_rev`
-2. Run it from a terminal (`./pooks_rev`) or your file manager's "Run" option. Most distros don't block unsigned binaries by default, but some app launchers may need this permission set first.
-
-> **Note:** These warnings appear because the app isn't yet code-signed with a paid developer certificate — not because anything is actually wrong with it. Code signing is on the roadmap for a future release.
-
-## License
-
-*(Add your license here, e.g. MIT, or "All rights reserved" if private.)*
+> **Note:** This warning appears because the app isn't yet code-signed with a paid developer certificate — not because anything is actually wrong with it. Code signing is on the roadmap for a future release.
