@@ -35,8 +35,8 @@ Pooks' Books is a personal reading journal — think of it as a diary for your b
 | Platform | Status |
 |---|---|
 | macOS | ✅ Supported (auto-updates included) |
-| Windows | ✅ Supported |
-| Linux | ✅ Supported |
+| Windows | 🚧 Coming soon |
+| Linux | 🚧 Coming soon |
 | Mobile (iOS/Android) | 🚧 Planned for a future release |
 
 ## Download & Installation
